@@ -1,73 +1,101 @@
-# Ex. No: 18E - Count the Number of Triangles in an Undirected Graph
+# Ex. No: 18C - Dijkstra's Single Source Shortest Path Algorithm
 
 ## AIM:
-To write a Python program to **count the number of triangles** present in an **undirected graph** using matrix operations.
+To write a Python program for **Dijkstra's single source shortest path algorithm**.
 
 ## ALGORITHM:
 
-**Step 1**: Initialize a matrix `aux2` to store the square of the adjacency matrix (i.e., `graph²`).  
-Also, initialize a matrix `aux3` to store the cube of the adjacency matrix (i.e., `graph³`).
+**Step 1**: Initialize a `distance[]` array with infinity for all vertices except the source, which is set to `0`.  
+Create a `sptSet[]` array (shortest path tree set) to keep track of vertices whose shortest distance from the source is finalized.
 
-**Step 2**: Multiply the adjacency matrix with itself to compute `aux2 = graph × graph`.
+**Step 2**: Pick the vertex `u` with the minimum distance value from the set of vertices not yet processed.
 
-**Step 3**: Multiply `aux2` with the adjacency matrix again to compute `aux3 = aux2 × graph`.
+**Step 3**: For every adjacent vertex `v` of the picked vertex `u`, if the current distance to `v` is greater than the distance to `u` plus the edge weight `(u, v)`, then update the distance of `v`.
 
-**Step 4**: Compute the **trace** of the matrix `aux3` (i.e., the sum of diagonal elements of the matrix).
+**Step 4**: Mark the vertex `u` as processed in `sptSet`.
 
-**Step 5**: Divide the trace by **6** to get the number of triangles in the graph.  
-*(Each triangle is counted six times in the trace — twice per vertex and once per direction.)*
+**Step 5**: Repeat Steps 2–4 until all vertices are processed.
 
-**Step 6**: Return the result.
+**Step 6**: Print the shortest distances from the source to all other vertices.
 
 ## PYTHON PROGRAM
 
 ```python
 
-# A Python3 program for finding number of
-# triangles in an Undirected Graph. The
-# program is for adjacency matrix
-# representation of the graph
+# Python program for Dijkstra's single source shortest path algorithm. 
+# The program is for adjacency matrix representation of the graph
 
-# Utility function for matrix
-# multiplication
-def multiply(A, B, C):
-	global V
-	for i in range(V):
-		for j in range(V):
-			C[i][j] = 0
-			for k in range(V):
-				C[i][j] += A[i][k] * B[k][j]
+# Library for INT_MAX
+import sys
 
-# Utility function to calculate
-# trace of a matrix (sum of
-# diagonal elements)
-def getTrace(graph):
-	global V
-	trace = 0
-	for i in range(V):
-		trace += graph[i][i]
-	return trace
+class Graph():
 
-# Utility function for calculating
-# number of triangles in graph
-def triangleInGraph(graph):
-	global V
-	
-	# To Store graph^2
-	aux2 = [[None] * V for i in range(V)]
+	def __init__(self, vertices):
+		self.V = vertices
+		self.graph = [[0 for column in range(vertices)]
+					for row in range(vertices)]
 
-	# To Store graph^3
-	aux3= [[None]*V for i in range(V)]
+	def printSolution(self, dist):
+		print("Vertex   Distance from Source")
+		for node in range(self.V):
+			print(node, "           ", dist[node])
 
-	# Initialising aux
-	# matrices with 0
-	for i in range(V):
-		for j in range(V):
-			aux2[i][j] = aux3[i][j] = 0
+	# A utility function to find the vertex with
+	# minimum distance value, from the set of vertices
+	# not yet included in shortest path tree
+	def minDistance(self, dist, sptSet):
+
+		# Initialize minimum distance for next node
+		min = sys.maxsize
+
+		# Search not nearest vertex not in the
+		# shortest path tree
+		for u in range(self.V):
+			if dist[u] < min and sptSet[u] == False:
+				min = dist[u]
+				min_index = u
+
+		return min_index
+
+	# Function that implements Dijkstra's single source
+	# shortest path algorithm for a graph represented
+	# using adjacency matrix representation
+	def dijkstra(self, src):
+
+		dist = [sys.maxsize] * self.V
+		dist[src] = 0
+		sptSet = [False] * self.V
+		
+		for count in range(self.V):
+		    x=self.minDistance(dist,sptSet)
+		    sptSet[x]=True
+		    for y in range(self.V):
+		        if self.graph[x][y]>0 and sptSet[y]==False and dist[y]>dist[x]+self.graph[x][y]:
+		            dist[y]=dist[x]+self.graph[x][y]
+
+
+
+		self.printSolution(dist)
+
+# Driver program
+g = Graph(9)
+g.graph = [[0, 4, 0, 0, 0, 0, 0, 8, 0],
+		[4, 0, 8, 0, 0, 0, 0, 11, 0],
+		[0, 8, 0, 7, 0, 4, 0, 0, 2],
+		[0, 0, 7, 0, 9, 14, 0, 0, 0],
+		[0, 0, 0, 9, 0, 10, 0, 0, 0],
+		[0, 0, 4, 14, 10, 0, 2, 0, 0],
+		[0, 0, 0, 0, 0, 2, 0, 1, 6],
+		[8, 11, 0, 0, 0, 0, 1, 0, 7],
+		[0, 0, 2, 0, 0, 0, 6, 7, 0]
+		];
+
+g.dijkstra(0);
 ```
+
 ## OUTPUT
 
-<img width="718" height="143" alt="Screenshot 2025-09-18 131814" src="https://github.com/user-attachments/assets/f9a98a14-87e2-4144-9097-900473683bad" />
+<img width="820" height="395" alt="image" src="https://github.com/user-attachments/assets/c22e2142-4c6f-47c7-a042-5f8aacdea2b9" />
 
 ## RESULT
 
